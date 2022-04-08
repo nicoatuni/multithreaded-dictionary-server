@@ -9,8 +9,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * TODO: add docs
- * 
  * @author Nico Dinata (770318)
  */
 public class DictionaryHandler {
@@ -42,7 +40,6 @@ public class DictionaryHandler {
         return (String) wordJsonObject.get(word);
     }
 
-    // TODO: add docs
     public synchronized static void addDefinition(String word, String definition)
             throws FileNotFoundException, IOException, ParseException, DuplicateWordException,
             NoWordDefinitionException {
@@ -61,7 +58,6 @@ public class DictionaryHandler {
         wordJsonObject.put(word, definition);
     }
 
-    // TODO: add docs
     public synchronized static void removeWord(String word)
             throws FileNotFoundException, IOException, ParseException, WordNotFoundException {
         if (wordJsonObject == null) {
@@ -75,7 +71,6 @@ public class DictionaryHandler {
         wordJsonObject.remove(word);
     }
 
-    // TODO: add docs
     public synchronized static void updateDefinition(String word, String definition)
             throws FileNotFoundException, IOException, ParseException, NoWordDefinitionException,
             WordNotFoundException {
