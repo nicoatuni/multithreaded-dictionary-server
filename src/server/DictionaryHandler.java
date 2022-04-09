@@ -12,13 +12,23 @@ import org.json.simple.parser.ParseException;
  * @author Nico Dinata (770318)
  */
 public class DictionaryHandler {
-    private static final String WORDS_FILE_PATH = "../../words.json";
-
     private static JSONObject wordJsonObject = null;
 
-    private static void initDictionaryFromFile() throws FileNotFoundException, IOException, ParseException {
+    /**
+     * Reads dictionary words from the specified file path (in JSON format) into
+     * memory.
+     * 
+     * @param filePath to read words from
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ParseException
+     */
+    public synchronized static void initDictionaryFile(String filePath)
+            throws FileNotFoundException, IOException, ParseException {
         JSONParser parser = new JSONParser();
-        wordJsonObject = (JSONObject) parser.parse(new FileReader(WORDS_FILE_PATH));
+        wordJsonObject = (JSONObject) parser.parse(new FileReader(filePath));
+
+        // TODO: commit changes to in-memory dictionary to disk at some point?
     }
 
     /**
@@ -31,24 +41,22 @@ public class DictionaryHandler {
      * @throws ParseException
      * @throws FileNotFoundException
      */
-    public synchronized static String getDefinition(String word)
-            throws IOException, ParseException, FileNotFoundException {
+    public synchronized static String getDefinition(String word) throws FileNotFoundException {
         if (wordJsonObject == null) {
-            initDictionaryFromFile();
+            throw new FileNotFoundException();
         }
 
         return (String) wordJsonObject.get(word);
     }
 
     public synchronized static void addDefinition(String word, String definition)
-            throws FileNotFoundException, IOException, ParseException, DuplicateWordException,
-            NoWordDefinitionException {
+            throws NoWordDefinitionException, FileNotFoundException, DuplicateWordException {
         if (definition == null) {
             throw new NoWordDefinitionException();
         }
 
         if (wordJsonObject == null) {
-            initDictionaryFromFile();
+            throw new FileNotFoundException();
         }
 
         if (wordJsonObject.containsKey(word)) {
@@ -59,9 +67,9 @@ public class DictionaryHandler {
     }
 
     public synchronized static void removeWord(String word)
-            throws FileNotFoundException, IOException, ParseException, WordNotFoundException {
+            throws FileNotFoundException, WordNotFoundException {
         if (wordJsonObject == null) {
-            initDictionaryFromFile();
+            throw new FileNotFoundException();
         }
 
         if (!wordJsonObject.containsKey(word)) {
@@ -72,14 +80,13 @@ public class DictionaryHandler {
     }
 
     public synchronized static void updateDefinition(String word, String definition)
-            throws FileNotFoundException, IOException, ParseException, NoWordDefinitionException,
-            WordNotFoundException {
+            throws NoWordDefinitionException, FileNotFoundException, WordNotFoundException {
         if (definition == null) {
             throw new NoWordDefinitionException();
         }
 
         if (wordJsonObject == null) {
-            initDictionaryFromFile();
+            throw new FileNotFoundException();
         }
 
         if (!wordJsonObject.containsKey(word)) {
