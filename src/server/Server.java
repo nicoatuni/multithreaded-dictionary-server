@@ -9,12 +9,16 @@ import java.net.Socket;
 import javax.net.ServerSocketFactory;
 
 public class Server {
-    // TODO: read this from user input when starting
-    private static int PORT = 3005;
-
     public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: java -jar Server.jar <port_number>");
+            System.exit(1);
+        }
+
+        final int portNumber = Integer.parseInt(args[0]);
+
         ServerSocketFactory factory = ServerSocketFactory.getDefault();
-        try (ServerSocket server = factory.createServerSocket(PORT)) {
+        try (ServerSocket server = factory.createServerSocket(portNumber)) {
             System.out.println("Waiting for client connection.");
             while (true) {
                 Socket client = server.accept();
@@ -22,26 +26,29 @@ public class Server {
                 t.start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // TODO: maybe log this into a file instead
+            System.out.println("IOException: cannot listen for connections on port " + portNumber);
+            System.out.println(e.getMessage());
         }
-
-        // TODO: read some default words from file
     }
 
-    private static void serveClient(Socket client) {
-        // TODO: remember to close sockets + kill thread when done
-        try (Socket clientSocket = client) {
-            DataInputStream input = new DataInputStream(clientSocket.getInputStream());
-            DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream());
-
+    private static void serveClient(Socket clientSocket) {
+        try (DataInputStream input = new DataInputStream(clientSocket.getInputStream());
+                DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())) {
             while (true) {
                 if (input.available() > 0) {
+                    // TODO: commit changes to in-memory dictionary to disk at some point?
                     String response = RequestHandler.handleRequest(input.readUTF());
                     output.writeUTF(response);
+                    output.flush();
                 }
             }
+
+            // TODO: close the socket?
         } catch (IOException e) {
-            // TODO
+            // TODO: maybe log this into a file instead
+            System.out.println("IOException");
+            e.printStackTrace();
         }
     }
 }
