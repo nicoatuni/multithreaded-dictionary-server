@@ -7,6 +7,8 @@ import org.json.simple.parser.JSONParser;
  * @author Nico Dinata (770318)
  */
 public class RequestHandler {
+    public static final String REQUEST_EXIT = "exit";
+
     private static final String REQUEST_OP_KEY = "operation";
     private static final String REQUEST_PAYLOAD_KEY = "payload";
 

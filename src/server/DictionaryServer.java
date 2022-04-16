@@ -24,11 +24,10 @@ public class DictionaryServer {
         try {
             DictionaryHandler.initDictionaryFile(dictionaryFilePath);
         } catch (FileNotFoundException e) {
-            // TODO: improve these exception messages
-            System.err.println("Error: dictionary file cannot be found.");
+            System.err.println("ServerError: dictionary file cannot be found.");
             System.exit(1);
         } catch (IOException | ParseException e) {
-            System.err.println("Error: something wrong when trying to read dictionary file.");
+            System.err.println("ServerError: something wrong when trying to read dictionary file.");
             System.exit(1);
         }
 
@@ -42,9 +41,7 @@ public class DictionaryServer {
                 t.start();
             }
         } catch (IOException e) {
-            // TODO: maybe log this into a file instead
-            System.out.println("IOException: cannot listen for connections on port " + portNumber);
-            System.out.println(e.getMessage());
+            System.err.println("ServerError: cannot listen for connections on port " + portNumber + ".");
         }
 
         // System.out.println("Exiting main, bye!");
@@ -58,8 +55,7 @@ public class DictionaryServer {
                 if (input.available() > 0) {
                     String inputString = input.readUTF();
                     // System.out.println("Client request received: " + inputString);
-                    // TODO: improve handling this special exit request
-                    if (inputString.equals("exit")) {
+                    if (inputString.equals(RequestHandler.REQUEST_EXIT)) {
                         break;
                     }
 
@@ -69,9 +65,7 @@ public class DictionaryServer {
             }
             clientSocket.close();
         } catch (IOException e) {
-            // TODO: maybe log this into a file instead
-            System.out.println("IOException");
-            e.printStackTrace();
+            System.err.println("ServerError: something wrong when serving client request.");
         }
 
         // System.out.println("Bye client!");
