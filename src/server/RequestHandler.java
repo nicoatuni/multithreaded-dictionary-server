@@ -1,12 +1,17 @@
 package server;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 /**
  * @author Nico Dinata (770318)
  */
-public class RequestHandler {
+public class RequestHandler implements Runnable {
     public static final String REQUEST_EXIT = "exit";
 
     private static final String REQUEST_OP_KEY = "operation";
@@ -17,7 +22,35 @@ public class RequestHandler {
     private static final String REQUEST_OP_REMOVE_WORD = "remove_word";
     private static final String REQUEST_OP_UPDATE_WORD = "update_word";
 
-    public static String handleRequest(String requestString) {
+    private Socket clientSocket;
+
+    public RequestHandler(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
+
+    @Override
+    public void run() {
+        try (DataInputStream input = new DataInputStream(clientSocket.getInputStream());
+                DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())) {
+            while (true) {
+                if (input.available() > 0) {
+                    String inputString = input.readUTF();
+                    // System.out.println("Client request received: " + inputString);
+                    if (inputString.equals(RequestHandler.REQUEST_EXIT)) {
+                        break;
+                    }
+
+                    String response = parseRequest(inputString);
+                    output.writeUTF(response);
+                }
+            }
+            clientSocket.close();
+        } catch (IOException e) {
+            System.err.println("ServerError: something wrong when serving client request");
+        }
+    }
+
+    private static String parseRequest(String requestString) {
         JSONParser parser = new JSONParser();
 
         try {

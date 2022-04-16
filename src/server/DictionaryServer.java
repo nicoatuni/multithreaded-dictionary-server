@@ -1,73 +1,78 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.net.ServerSocketFactory;
 
-import org.json.simple.parser.ParseException;
-
+/**
+ * Main server class handling incoming client connections and passing them over
+ * to a thread pool to handle.
+ * 
+ * @author Nico Eka Dinata (770318)
+ * 
+ */
 public class DictionaryServer {
+    private static final int MAX_THREAD_POOL_SIZE = 16;
+
     public static void main(String[] args) {
+
         if (args.length < 2) {
-            System.err.println("Usage: java -jar Server.jar <port_number> <dictionary_file>");
+            System.err.println("Usage: java -jar DictionaryServer.jar <port_number> <dictionary_file_path>");
             System.exit(1);
         }
 
         final int portNumber = Integer.parseInt(args[0]);
         final String dictionaryFilePath = args[1];
 
+        // try to initialise the dictionary file into memory
         try {
             DictionaryHandler.initDictionaryFile(dictionaryFilePath);
         } catch (FileNotFoundException e) {
-            System.err.println("ServerError: dictionary file cannot be found.");
+            System.err.println("ServerError: unable to find dictionary file at path '" + dictionaryFilePath + "'");
             System.exit(1);
-        } catch (IOException | ParseException e) {
-            System.err.println("ServerError: something wrong when trying to read dictionary file.");
+        } catch (Exception e) {
+            System.err.println(
+                    "ServerError: unable to read and parse dictionary file at path '" + dictionaryFilePath + "'");
             System.exit(1);
         }
 
+        // set up server socket
         ServerSocketFactory factory = ServerSocketFactory.getDefault();
         try (ServerSocket server = factory.createServerSocket(portNumber)) {
-            // System.out.println("Waiting for client connection.");
+            System.out.println("Server: listening for connections on port " + portNumber);
+
+            // TODO: initialise server GUI?
+
+            // initialise thread pool to handle client requests
+            ExecutorService threadPool = Executors.newFixedThreadPool(MAX_THREAD_POOL_SIZE);
 
             while (true) {
-                Socket client = server.accept();
-                Thread t = new Thread(() -> serveClient(client));
-                t.start();
-            }
-        } catch (IOException e) {
-            System.err.println("ServerError: cannot listen for connections on port " + portNumber + ".");
-        }
-
-        // System.out.println("Exiting main, bye!");
-    }
-
-    private static void serveClient(Socket clientSocket) {
-        // System.out.println("Hi client, let me help you.");
-        try (DataInputStream input = new DataInputStream(clientSocket.getInputStream());
-                DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())) {
-            while (true) {
-                if (input.available() > 0) {
-                    String inputString = input.readUTF();
-                    // System.out.println("Client request received: " + inputString);
-                    if (inputString.equals(RequestHandler.REQUEST_EXIT)) {
-                        break;
-                    }
-
-                    String response = RequestHandler.handleRequest(inputString);
-                    output.writeUTF(response);
+                try {
+                    // pass off accepted client request to worker thread
+                    Socket clientSocket = server.accept();
+                    threadPool.execute(new RequestHandler(clientSocket));
+                } catch (SocketException e) {
+                    // according to the docs, this exception gets thrown when
+                    // the socket (`server` in this case) has been closed
+                    // reference:
+                    // https://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html#close--
+                    System.out.println("Server shutdown: no longer listening for connections");
+                    break;
+                } catch (IOException e) {
+                    System.err.println("ServerError: unable to accept incoming client connection");
                 }
             }
-            clientSocket.close();
-        } catch (IOException e) {
-            System.err.println("ServerError: something wrong when serving client request.");
-        }
 
-        // System.out.println("Bye client!");
+            // server is shut down, so shut down thread pool as well
+            threadPool.shutdown();
+        } catch (IOException e) {
+            System.err.println("ServerError: cannot listen for connections on port " + portNumber);
+        }
     }
 }
