@@ -12,7 +12,7 @@ import javax.net.ServerSocketFactory;
 
 /**
  * Main server class handling incoming client connections and passing them over
- * to a thread pool to handle.
+ * to worker threads in a pool to process.
  * 
  * @author Nico Eka Dinata (770318)
  * 

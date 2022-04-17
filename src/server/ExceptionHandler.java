@@ -5,7 +5,12 @@ import java.io.FileNotFoundException;
 import org.json.simple.parser.ParseException;
 
 /**
- * @author Nico Dinata (770318)
+ * Helper class for handling the various exceptions the server and all its
+ * components can throw. Formats these exceptions into an object containing an
+ * error title and message.
+ * 
+ * @author Nico Eka Dinata (770318)
+ * 
  */
 public class ExceptionHandler {
     public static ErrorResponse handle(Exception e, String customErrorMsg) {
@@ -41,11 +46,14 @@ public class ExceptionHandler {
     }
 }
 
+/** Helper subclass for when duplicate words have been detected. */
 class DuplicateWordException extends Exception {
 }
 
+/** Helper subclass for when a requested word does not exist. */
 class WordNotFoundException extends Exception {
 }
 
+/** Helper subclass for when a new added word has no accompanying definition. */
 class NoWordDefinitionException extends Exception {
 }
