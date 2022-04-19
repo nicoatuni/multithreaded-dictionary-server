@@ -62,6 +62,7 @@ public class ClientGUI extends JFrame {
 		searchResults = new JTextArea();
 		searchResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		searchResults.setEditable(false);
+		searchResults.setLineWrap(true);
 		searchResults.setBounds(10, 53, 615, 60);
 		getContentPane().add(searchResults);
 
@@ -106,6 +107,7 @@ public class ClientGUI extends JFrame {
 		addNewWordResults = new JTextArea();
 		addNewWordResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		addNewWordResults.setEditable(false);
+		addNewWordResults.setLineWrap(true);
 		addNewWordResults.setBounds(12, 227, 615, 34);
 		getContentPane().add(addNewWordResults);
 
@@ -145,6 +147,7 @@ public class ClientGUI extends JFrame {
 		updateWordResults = new JTextArea();
 		updateWordResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		updateWordResults.setEditable(false);
+		updateWordResults.setLineWrap(true);
 		updateWordResults.setBounds(12, 381, 615, 34);
 		getContentPane().add(updateWordResults);
 
@@ -182,6 +185,7 @@ public class ClientGUI extends JFrame {
 		removeWordResults = new JTextArea();
 		removeWordResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		removeWordResults.setEditable(false);
+		removeWordResults.setLineWrap(true);
 		removeWordResults.setBounds(12, 498, 615, 34);
 		getContentPane().add(removeWordResults);
 
