@@ -31,8 +31,6 @@ public class DictionaryHandler {
             throws FileNotFoundException, IOException, ParseException {
         JSONParser parser = new JSONParser();
         wordJsonObject = (JSONObject) parser.parse(new FileReader(filePath));
-
-        // TODO: commit changes to in-memory dictionary to disk at some point?
     }
 
     /**
