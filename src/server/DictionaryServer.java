@@ -34,11 +34,13 @@ public class DictionaryServer {
         try {
             DictionaryHandler.initDictionaryFile(dictionaryFilePath);
         } catch (FileNotFoundException e) {
-            System.err.println("ServerError: unable to find dictionary file at path '" + dictionaryFilePath + "'");
+            System.err.println(
+                    "ServerError: unable to find dictionary file at path '" + dictionaryFilePath + "', exiting");
             System.exit(1);
         } catch (Exception e) {
             System.err.println(
-                    "ServerError: unable to read and parse dictionary file at path '" + dictionaryFilePath + "'");
+                    "ServerError: unable to read and parse dictionary file at path '" + dictionaryFilePath
+                            + "', exiting");
             System.exit(1);
         }
 
@@ -72,7 +74,10 @@ public class DictionaryServer {
             // server is shut down, so shut down thread pool as well
             threadPool.shutdown();
         } catch (IOException e) {
-            System.err.println("ServerError: cannot listen for connections on port " + portNumber);
+            System.err.println("ServerError: unable to listen for connections on port " + portNumber + ", exiting");
+            System.exit(1);
         }
+
+        System.exit(0);
     }
 }

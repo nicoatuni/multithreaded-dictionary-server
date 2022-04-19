@@ -58,8 +58,6 @@ public class RequestHandler implements Runnable {
             return;
         }
 
-        // System.out.println("Hello client!");
-
         // read and parse client requests as long as there are any
         String inputString;
         try {
@@ -73,13 +71,20 @@ public class RequestHandler implements Runnable {
                 }
             }
         } catch (IOException e) {
-            System.err.println("RequestHandlerError: error when reading from client input");
+            System.err.println("RequestHandlerError: error when reading from client input, exiting");
         }
 
         // client is no longer interested: let's close and exit
         try {
-            // System.out.println("Bye client!");
-            this.clientSocket.close();
+            if (input != null) {
+                input.close();
+            }
+            if (output != null) {
+                output.close();
+            }
+            if (!this.clientSocket.isClosed()) {
+                this.clientSocket.close();
+            }
         } catch (IOException e) {
             System.err.println("RequestHandlerError: unable to close client socket, exiting");
         }
