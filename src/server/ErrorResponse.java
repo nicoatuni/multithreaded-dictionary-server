@@ -3,7 +3,10 @@ package server;
 import org.json.simple.JSONObject;
 
 /**
- * @author Nico Dinata (770318)
+ * Wrapper type representing an error response returned by the server.
+ * 
+ * @author Nico Eka Dinata (770318)
+ * 
  */
 public class ErrorResponse extends JSONObject {
     public ErrorResponse(String errorTitle, String errorMessage) {

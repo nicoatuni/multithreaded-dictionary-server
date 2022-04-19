@@ -13,14 +13,21 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * @author Nico Dinata (770318)
+ * Main client class allowing for interaction with a dictionary server. Handles
+ * both incoming and outgoing communication logic with the server as an
+ * interface between the server and the GUI layer.
+ * 
+ * @author Nico Eka Dinata (770318)
+ * 
  */
 public class DictionaryClient {
+    // the operations supported by the dictionary server
     private static final String REQUEST_OP_QUERY_WORD = "query_word";
     private static final String REQUEST_OP_ADD_WORD = "add_word";
     private static final String REQUEST_OP_REMOVE_WORD = "remove_word";
     private static final String REQUEST_OP_UPDATE_WORD = "update_word";
 
+    // the possible status of the response returned by the server
     private static final String SERVER_RESPONSE_SUCCESS = "success";
     private static final String SERVER_RESPONSE_ERROR = "error";
 
@@ -37,6 +44,7 @@ public class DictionaryClient {
         final String serverHostname = args[0];
         final int serverPortNumber = Integer.parseInt(args[1]);
 
+        // try to initialise connection with the server
         Socket socket = null;
         try {
             socket = new Socket(serverHostname, serverPortNumber);
@@ -51,6 +59,7 @@ public class DictionaryClient {
             System.exit(1);
         }
 
+        // try to establish I/O streams with the server
         DictionaryClient clientInstance = new DictionaryClient();
         try {
             clientInstance.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -67,6 +76,7 @@ public class DictionaryClient {
             System.exit(1);
         }
 
+        // initialise and watch the GUI as long as it is running
         ClientGUI gui = new ClientGUI(clientInstance);
         while (gui.isRunning()) {
             try {
@@ -94,6 +104,7 @@ public class DictionaryClient {
         System.exit(0);
     }
 
+    /** Requests the server to query the given word's definition. */
     public String requestQueryWord(String word) {
         if (word.isBlank()) {
             return "Please enter a valid word to search for.";
@@ -127,6 +138,7 @@ public class DictionaryClient {
         return serverResponse;
     }
 
+    /** Requests the server to add a new word definition. */
     public String requestAddWord(String word, String definition) {
         if (word.isBlank() || definition.isBlank()) {
             return "Both the new word and its definition can not be blank.";
@@ -158,6 +170,7 @@ public class DictionaryClient {
         return serverResponse;
     }
 
+    /** Requests the server to update an existing word's definition. */
     public String requestUpdateWord(String word, String definition) {
         if (word.isBlank() || definition.isBlank()) {
             return "Both the word and its updated definition can not be blank.";
@@ -189,6 +202,7 @@ public class DictionaryClient {
         return serverResponse;
     }
 
+    /** Requests the server to remove the given word. */
     public String requestRemoveWord(String word) {
         if (word.isBlank()) {
             return "Please enter a valid word to remove.";
@@ -217,6 +231,10 @@ public class DictionaryClient {
         return serverResponse;
     }
 
+    /**
+     * Helper method to write a request to the server and do some light checking
+     * on its response.
+     */
     private JSONObject writeToServer(String requestString)
             throws IOException, ParseException, InvalidServerResponseException {
         output.write(requestString + "\n");
@@ -235,5 +253,6 @@ public class DictionaryClient {
     }
 }
 
+/** Helper subclass representing an invalid server response. */
 class InvalidServerResponseException extends Exception {
 }
