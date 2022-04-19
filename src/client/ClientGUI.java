@@ -5,6 +5,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class ClientGUI extends JFrame {
+	private DictionaryClient client;
+	private boolean isRunning;
+
 	private JTextField searchTextField;
 	private JTextField newWordInput;
 	private JTextField newWordDefinitionInput;
@@ -12,9 +15,30 @@ public class ClientGUI extends JFrame {
 	private JTextField updateWordDefinitionInput;
 	private JTextField removeWordInput;
 
-	public ClientGUI() {
+	private JTextArea searchResults;
+	private JTextArea addNewWordResults;
+	private JTextArea updateWordResults;
+	private JTextArea removeWordResults;
+
+	public ClientGUI(DictionaryClient client) {
+		this.client = client;
+		this.isRunning = true;
+		initialiseGUI();
+
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				isRunning = false;
+			}
+		});
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	private void initialiseGUI() {
 		setTitle("Dictionary Client");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(640, 600);
 		getContentPane().setLayout(null);
 
@@ -28,13 +52,14 @@ public class ClientGUI extends JFrame {
 		searchButton.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
 		searchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: query word definition
+				String formattedResponse = client.requestQueryWord(searchTextField.getText());
+				searchResults.setText(formattedResponse);
 			}
 		});
 		searchButton.setBounds(514, 6, 117, 34);
 		getContentPane().add(searchButton);
 
-		JTextArea searchResults = new JTextArea();
+		searchResults = new JTextArea();
 		searchResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		searchResults.setEditable(false);
 		searchResults.setBounds(10, 53, 615, 60);
@@ -69,14 +94,16 @@ public class ClientGUI extends JFrame {
 		JButton addNewWordButton = new JButton("Add");
 		addNewWordButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: add new word definition
+				String formattedResponse = client.requestAddWord(newWordInput.getText(),
+						newWordDefinitionInput.getText());
+				addNewWordResults.setText(formattedResponse);
 			}
 		});
 		addNewWordButton.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
 		addNewWordButton.setBounds(514, 180, 117, 34);
 		getContentPane().add(addNewWordButton);
 
-		JTextArea addNewWordResults = new JTextArea();
+		addNewWordResults = new JTextArea();
 		addNewWordResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		addNewWordResults.setEditable(false);
 		addNewWordResults.setBounds(12, 227, 615, 34);
@@ -106,14 +133,16 @@ public class ClientGUI extends JFrame {
 		JButton updateWordButton = new JButton("Update");
 		updateWordButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: update word definition
+				String formattedResponse = client.requestUpdateWord(updateWordInput.getText(),
+						updateWordDefinitionInput.getText());
+				updateWordResults.setText(formattedResponse);
 			}
 		});
 		updateWordButton.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
 		updateWordButton.setBounds(514, 334, 117, 34);
 		getContentPane().add(updateWordButton);
 
-		JTextArea updateWordResults = new JTextArea();
+		updateWordResults = new JTextArea();
 		updateWordResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		updateWordResults.setEditable(false);
 		updateWordResults.setBounds(12, 381, 615, 34);
@@ -142,18 +171,19 @@ public class ClientGUI extends JFrame {
 		JButton removeWordButton = new JButton("Remove");
 		removeWordButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: remove word
+				String formattedResponse = client.requestRemoveWord(removeWordInput.getText());
+				removeWordResults.setText(formattedResponse);
 			}
 		});
 		removeWordButton.setFont(new Font("Helvetica Neue", Font.PLAIN, 14));
 		removeWordButton.setBounds(514, 451, 117, 34);
 		getContentPane().add(removeWordButton);
 
-		JTextArea updateWordResults_1 = new JTextArea();
-		updateWordResults_1.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
-		updateWordResults_1.setEditable(false);
-		updateWordResults_1.setBounds(12, 498, 615, 34);
-		getContentPane().add(updateWordResults_1);
+		removeWordResults = new JTextArea();
+		removeWordResults.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
+		removeWordResults.setEditable(false);
+		removeWordResults.setBounds(12, 498, 615, 34);
+		getContentPane().add(removeWordResults);
 
 		setVisible(true);
 	}
