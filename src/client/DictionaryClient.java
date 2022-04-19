@@ -95,6 +95,10 @@ public class DictionaryClient {
     }
 
     public String requestQueryWord(String word) {
+        if (word.isBlank()) {
+            return "Please enter a valid word to search for.";
+        }
+
         JSONObject requestObj = new JSONObject();
         requestObj.put("operation", REQUEST_OP_QUERY_WORD);
         requestObj.put("payload", word);
@@ -124,6 +128,10 @@ public class DictionaryClient {
     }
 
     public String requestAddWord(String word, String definition) {
+        if (word.isBlank() || definition.isBlank()) {
+            return "Both the new word and its definition can not be blank.";
+        }
+
         JSONObject requestObj = new JSONObject();
         requestObj.put("operation", REQUEST_OP_ADD_WORD);
         JSONObject addPayload = new JSONObject();
@@ -151,6 +159,10 @@ public class DictionaryClient {
     }
 
     public String requestUpdateWord(String word, String definition) {
+        if (word.isBlank() || definition.isBlank()) {
+            return "Both the word and its updated definition can not be blank.";
+        }
+
         JSONObject requestObj = new JSONObject();
         requestObj.put("operation", REQUEST_OP_UPDATE_WORD);
         JSONObject addPayload = new JSONObject();
@@ -178,6 +190,10 @@ public class DictionaryClient {
     }
 
     public String requestRemoveWord(String word) {
+        if (word.isBlank()) {
+            return "Please enter a valid word to remove.";
+        }
+
         JSONObject requestObj = new JSONObject();
         requestObj.put("operation", REQUEST_OP_REMOVE_WORD);
         requestObj.put("payload", word);
