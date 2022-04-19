@@ -34,7 +34,7 @@ public class ClientGUI extends JFrame {
 	public ClientGUI(DictionaryClient client) {
 		this.client = client;
 		this.isRunning = true;
-		initialiseGUI();
+		this.initialiseGUI();
 
 		// set `isRunning` to `false` when window is closed by the user
 		this.addWindowListener(new WindowAdapter() {

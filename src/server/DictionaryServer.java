@@ -18,7 +18,7 @@ import javax.net.ServerSocketFactory;
  * 
  */
 public class DictionaryServer {
-    private static final int MAX_THREAD_POOL_SIZE = 16;
+    // private static final int MAX_THREAD_POOL_SIZE = 16;
 
     public static void main(String[] args) {
 
@@ -44,17 +44,33 @@ public class DictionaryServer {
             System.exit(1);
         }
 
+        // initialise the GUI and wait until we are allowed to start the server
+        ServerGUI gui = new ServerGUI();
+        while (gui.isRunning() && !gui.shouldServerStart()) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                System.err.println("ServerError: main is interrupted, exiting");
+                System.exit(1);
+            }
+        }
+
+        // if GUI is no longer running, we shut down the server
+        if (!gui.isRunning()) {
+            System.out.println("Server shutdown: exiting");
+            System.exit(0);
+        }
+
         // set up server socket
         ServerSocketFactory factory = ServerSocketFactory.getDefault();
         try (ServerSocket server = factory.createServerSocket(portNumber)) {
             System.out.println("Server: listening for connections on port " + portNumber);
 
-            // TODO: initialise server GUI?
+            // initialise thread pool using a size value set on the GUI
+            int threadPoolSize = gui.useThreadCount(server);
+            ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolSize);
 
-            // initialise thread pool to handle client requests
-            ExecutorService threadPool = Executors.newFixedThreadPool(MAX_THREAD_POOL_SIZE);
-
-            while (true) {
+            while (gui.isRunning()) {
                 try {
                     // pass off accepted client request to worker thread
                     Socket clientSocket = server.accept();
@@ -64,20 +80,26 @@ public class DictionaryServer {
                     // the socket (`server` in this case) has been closed
                     // reference:
                     // https://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html#close--
-                    System.out.println("Server shutdown: no longer listening for connections");
                     break;
                 } catch (IOException e) {
                     System.err.println("ServerError: unable to accept incoming client connection");
                 }
             }
 
-            // server is shut down, so shut down thread pool as well
+            // shut down server socket and thread pool
+            System.out.println("Server shutdown: no longer listening for connections, exiting");
+            if (!server.isClosed()) {
+                try {
+                    server.close();
+                } catch (IOException e) {
+                    System.err.println("ServerError: unable to close socket, exiting");
+                }
+            }
             threadPool.shutdown();
+            System.exit(0);
         } catch (IOException e) {
             System.err.println("ServerError: unable to listen for connections on port " + portNumber + ", exiting");
             System.exit(1);
         }
-
-        System.exit(0);
     }
 }
