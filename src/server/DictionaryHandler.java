@@ -44,7 +44,7 @@ public class DictionaryHandler {
             throw new FileNotFoundException();
         }
 
-        return (String) wordJsonObject.get(word);
+        return (String) wordJsonObject.get(word.toLowerCase());
     }
 
     /**
@@ -62,11 +62,11 @@ public class DictionaryHandler {
             throw new FileNotFoundException();
         }
 
-        if (wordJsonObject.containsKey(word)) {
+        if (wordJsonObject.containsKey(word.toLowerCase())) {
             throw new DuplicateWordException();
         }
 
-        wordJsonObject.put(word, definition);
+        wordJsonObject.put(word.toLowerCase(), definition);
     }
 
     /**
@@ -80,11 +80,11 @@ public class DictionaryHandler {
             throw new FileNotFoundException();
         }
 
-        if (!wordJsonObject.containsKey(word)) {
+        if (!wordJsonObject.containsKey(word.toLowerCase())) {
             throw new WordNotFoundException();
         }
 
-        wordJsonObject.remove(word);
+        wordJsonObject.remove(word.toLowerCase());
     }
 
     /**
@@ -102,10 +102,10 @@ public class DictionaryHandler {
             throw new FileNotFoundException();
         }
 
-        if (!wordJsonObject.containsKey(word)) {
+        if (!wordJsonObject.containsKey(word.toLowerCase())) {
             throw new WordNotFoundException();
         }
 
-        wordJsonObject.put(word, definition);
+        wordJsonObject.put(word.toLowerCase(), definition);
     }
 }
